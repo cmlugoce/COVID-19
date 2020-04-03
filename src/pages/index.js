@@ -4,6 +4,7 @@ import Layout from 'components/Layout';
 import Container from 'components/Container';
 import Map from 'components/Map';
 import axios from 'axios';
+import { geoJSON } from 'leaflet';
 
 const LOCATION = {
   lat: 38.9072,
@@ -33,8 +34,35 @@ const IndexPage = () => {
     }
 
     const {data = []} = response;
-    console.log(data)
+    const hasData = Array.isArray(data) && data.length > 0;
+    console.log(data);
+
+    if (!hasData) return;
+
+    const geoJson = {
+      type: 'FeatureCollection',
+      features: data.map((country = {}) => {
+        const { countryInfo = {} } = country;
+        const { lat, long: lng } = countryInfo;
+        return {
+          type: 'Feature',
+          properties: {
+            ...country,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [ lng, lat ]
+          }
+        }
+      })
+      
+    }
+   
+    console.log(geoJson)
+
   }
+
+
   
   const mapSettings = {
     center: CENTER,
